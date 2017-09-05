@@ -60,8 +60,8 @@ class URL
 	}
 	protected function getRelativePath($path = '')
 	{
-		if (trim($path) == '') {
-			return $this->root . '/';
+		if (trim($path, '/') == '') {
+			return $this->root;
 		}
 		$path = explode('/', str_replace('\\', '/', $path));
 		$url = explode('/', $this->getBaseUrl());
@@ -69,6 +69,9 @@ class URL
 			if ($seg == '..') {
 				array_pop($url);
 			} else {
+				if (trim($seg) == '') {
+					continue;
+				}
 				$url []= $seg;
 			}
 		}
