@@ -2,7 +2,7 @@
 namespace App\Contract;
 
 use App\Definition\Contract;
-use App\Service\URL;
+use App\Service\URL as URLService;
 
 class URL
 {
@@ -10,7 +10,7 @@ class URL
 	
 	protected function newInstance()
 	{
-		return new URL();
+		return new URLService();
 	}
 	public function url($path = '', $variables = null)
 	{
