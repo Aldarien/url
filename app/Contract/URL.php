@@ -8,11 +8,11 @@ class URL
 {
 	use Contract;
 	
-	protected function newInstance()
+	protected static function newInstance()
 	{
 		return new URLService();
 	}
-	public function url($path = '', $variables = null)
+	public static function url($path = '', $variables = null)
 	{
 		$instance = self::getInstance();
 		return $instance->url($path, $variables);
