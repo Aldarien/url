@@ -25,7 +25,7 @@ class URL
 				return $name;
 			}
 		}
-		return '';
+		return $_SERVER['HTTP_HOST'];
 	}
 	protected function findRelative()
 	{
@@ -34,12 +34,11 @@ class URL
 			array_shift($name);
 		}
 		array_pop($name);
-		array_shift($name);
 		
 		return implode('/', $name);
 	}
-
-
+	
+	
 	public function url($path = '', $variables = null)
 	{
 		if (strpos($path, '//') !== false) {
@@ -50,7 +49,7 @@ class URL
 		if ($variables != null) {
 			$url .= '?' . http_build_query($variables);
 		}
-
+		
 		return $url;
 	}
 	protected function getBaseUrl()
@@ -61,7 +60,7 @@ class URL
 	protected function getRelativePath($path = '')
 	{
 		if (trim($path, '/') == '') {
-			return $this->root;
+			return '/' . $this->root . '/' . $this->relative;
 		}
 		$path = explode('/', str_replace('\\', '/', $path));
 		$url = explode('/', $this->getBaseUrl());
