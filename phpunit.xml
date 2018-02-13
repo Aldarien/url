@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+	colors="true"
+	verbose="true"
+	bootstrap="./vendor/autoload.php"
+>
+	<php>
+        <server name="HTTP_HOST" value="http://localhost/" />
+        <server name="SCRIPT_NAME" value="http://localhost/index.php" />
+    </php>
+    <testsuites>
+        <testsuite name="Application Test Suite">
+            <directory>./tests/</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+    	<whitelist>
+    		<directory>./app</directory>
+    	</whitelist>
+    </filter>
+</phpunit>
