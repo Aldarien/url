@@ -18,7 +18,7 @@ class URL
 	
 	protected function findRoot()
 	{
-		$uri = Http::createFromString($_SERVER['SCRIPT_NAME']);
+		$uri = Http::createFromString(\Sabre\Uri\resolve($_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'], $_SERVER['SCRIPT_NAME']));
 		$host = new Host($uri->getHost());
 		if ($host->isAbsolute()) {
 			return $host->getRegistrableDomain();
