@@ -1,6 +1,11 @@
 <?php
 namespace App\Service;
 
+use League\Uri\Http;
+use League\Uri\Components\Host;
+use League\Uri\Components\HierarchicalPath;
+use League\Uri\Factory;
+
 class URL
 {
 	protected $root;
@@ -14,68 +19,55 @@ class URL
 	
 	protected function findRoot()
 	{
-		$name = explode('/', $_SERVER['SCRIPT_NAME']);
-		if (trim($name[0]) == '') {
-			array_shift($name);
+		$uri = Http::createFromString($_SERVER['HTTP_HOST']);
+		$host = new Host($uri->getHost());
+		if ($host->isAbsolute()) {
+			return $host->getRegistrableDomain();
 		}
-		$name = array_shift($name);
-		$root = explode(DIRECTORY_SEPARATOR, root());
-		foreach ($root as $seg) {
-			if ($name == $seg) {
-				return $name;
-			}
-		}
-		return $_SERVER['HTTP_HOST'];
+		return $host . '';
 	}
 	protected function findRelative()
 	{
-		$name = explode('/', $_SERVER['SCRIPT_NAME']);
-		if (trim($name[0]) == '') {
-			array_shift($name);
+		$uri = Http::createFromString($_SERVER['SCRIPT_NAME']);
+		$normalized = (new HierarchicalPath($uri->getPath()))->withoutLeadingSlash()->withoutTrailingSlash()->withoutDotSegments()->withoutEmptySegments();
+		if ($normalized->getDirname() == '.') {
+			return '';
 		}
-		array_pop($name);
-		
-		return implode('/', $name);
+		return $normalized->getDirname();
 	}
 	
 	
 	public function url($path = '', $variables = null)
 	{
-		if (strpos($path, '//') !== false) {
+		$uri = Http::createFromString($path);
+		if ($uri->getHost() != $this->root and $uri->getHost() != '') {
 			return $path;
 		}
 		
-		$url = '/' . $this->getRelativePath($path);
+		$url = $this->getRelativePath($path);
 		if ($variables != null) {
-			$url .= '?' . http_build_query($variables);
+			$url = $url . '?' . http_build_query($variables);			
 		}
 		
-		return $url;
+		return $url . '';
 	}
 	protected function getBaseUrl()
 	{
-		$url = trim($this->root . '/' . $this->relative, '/');
+		$url = 'http://' . trim($this->root . '/' . $this->relative, '/');
 		return $url;
 	}
 	protected function getRelativePath($path = '')
 	{
 		if (trim($path, '/') == '') {
-			return '/' . $this->root . '/' . $this->relative;
+			return Http::createFromString('http://' . $this->root . '/' . $this->relative);
 		}
-		$path = explode('/', str_replace('\\', '/', $path));
-		$url = explode('/', $this->getBaseUrl());
-		foreach ($path as $seg) {
-			if ($seg == '..') {
-				array_pop($url);
-			} else {
-				if (trim($seg) == '') {
-					continue;
-				}
-				$url []= $seg;
-			}
-		}
+		$uri = Http::createFromString($path);
+		$normalized = (new HierarchicalPath($uri->getPath()))->withoutTrailingSlash()->withoutEmptySegments();
 		
-		return implode('/', $url);
+		$factory = new Factory();
+		$uri = $factory->create($normalized . '', $this->getBaseUrl());
+		
+		return $uri;
 	}
 }
 ?>
