@@ -5,8 +5,9 @@
 	bootstrap="./vendor/autoload.php"
 >
 	<php>
-        <server name="HTTP_HOST" value="www.example.com" />
+        <server name="HTTP_HOST" value="test.example.com" />
         <server name="SCRIPT_NAME" value="/testing/index.php" />
+        <server name="REQUEST_SCHEME" value="http" />
     </php>
     <testsuites>
         <testsuite name="Application Test Suite">
