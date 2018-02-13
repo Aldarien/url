@@ -16,40 +16,40 @@ class URLTest extends TestCase
 	}
 	public function testAbsoluteFile()
 	{
-		$url = 'http://localhost/page.php';
+		$url = 'http://test.example.com/page.php';
 		$this->assertEquals($url, url($url));
 	}
 	public function testRelativeFile()
 	{
 		$url = 'page.php';
-		$result = 'http://localhost/page.php';
+		$result = 'http://test.example.com/testing/page.php';
 		
 		$this->assertEquals($result, url($url));
 	}
 	public function testUpperRelativeFile()
 	{
-		$url = '/data/../page.php';
-		$result = 'http://localhost/page.php';
+		$url = 'data/../page.php';
+		$result = 'http://test.example.com/testing/page.php';
 		
 		$this->assertEquals($result, url($url));
 	}
 	public function testMaxUpperRelativeFile()
 	{
 		$url = '/data/../../../../../page.php';
-		$result = 'http://localhost/page.php';
+		$result = 'http://example.com/page.php';
 		$this->assertEquals($result, url($url));
 	}
 	public function testRelativePath()
 	{
 		$url = '/data';
-		$result = 'http://localhost/data';
+		$result = 'http://test.example.com/data';
 		$this->assertEquals($result, url($url));
 	}
 	public function testQuery()
 	{
 		$url = '';
 		$query = ['p' => 'page', 'o' => 'options'];
-		$output = 'http://localhost/?p=page&o=options';
+		$output = 'http://test.example.com/testing/?p=page&o=options';
 		$result = url($url, $query);
 		$this->assertEquals($output, $result);
 	}
