@@ -53,5 +53,14 @@ class URLTest extends TestCase
 		$result = url($url, $query);
 		$this->assertEquals($output, $result);
 	}
+	public function testDifferentServer()
+	{
+		$_SERVER['SCRIPT_NAME'] = 'test.example.com/testing/index.php';
+		
+		$url = 'page.php';
+		$output = 'http://test.example.com/testing/page.php';
+		$result = url($url);
+		$this->assertEquals($output, $result);
+	}
 }
 ?>
