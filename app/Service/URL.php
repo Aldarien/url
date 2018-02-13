@@ -23,7 +23,7 @@ class URL
 		if ($host->isAbsolute()) {
 			return $host->getRegistrableDomain();
 		}
-		return $uri->getScheme() . '://' . $host;
+		return ($uri->getScheme() ?: 'http') . '://' . $host;
 	}
 	protected function findRelative()
 	{
