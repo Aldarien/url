@@ -4,7 +4,6 @@ namespace App\Service;
 use League\Uri\Http;
 use League\Uri\Components\Host;
 use League\Uri\Components\HierarchicalPath;
-use League\Uri\Factory;
 
 class URL
 {
@@ -19,12 +18,12 @@ class URL
 	
 	protected function findRoot()
 	{
-		$uri = Http::createFromString($_SERVER['HTTP_HOST']);
+		$uri = Http::createFromString($_SERVER['SCRIPT_NAME']);
 		$host = new Host($uri->getHost());
 		if ($host->isAbsolute()) {
 			return $host->getRegistrableDomain();
 		}
-		return $host . '';
+		return $uri->getScheme() . '://' . $host;
 	}
 	protected function findRelative()
 	{
@@ -44,30 +43,26 @@ class URL
 			return $path;
 		}
 		
-		$url = $this->getRelativePath($path);
-		if ($variables != null) {
-			$url = $url . '?' . http_build_query($variables);			
+		$uri = \Sabre\Uri\resolve($this->getBaseUrl(), $path);
+		$host = new Host(Http::createFromString($uri)->getHost());
+		$base = new Host(Http::createFromString($this->root)->getHost());
+		if ($host . '' != $base . '') {
+			$host = new Host(Http::createFromString($this->root)->getHost());
+			$page = str_replace($this->root, '', $uri);
+			$uri = \Sabre\Uri\resolve(Http::createFromString($this->root)->getScheme() . '://' . $host->getRegistrableDomain(). '/', $page);
 		}
 		
-		return $url . '';
+		if ($variables != null) {
+			$uri = \Sabre\Uri\resolve($uri, '?' . http_build_query($variables));
+		}
+		$uri = \Sabre\Uri\normalize($uri);
+		
+		return $uri;
 	}
 	protected function getBaseUrl()
 	{
-		$url = 'http://' . trim($this->root . '/' . $this->relative, '/');
+		$url = \Sabre\Uri\normalize(trim($this->root . '/' . $this->relative, '/') . '/');
 		return $url;
-	}
-	protected function getRelativePath($path = '')
-	{
-		if (trim($path, '/') == '') {
-			return Http::createFromString('http://' . $this->root . '/' . $this->relative);
-		}
-		$uri = Http::createFromString($path);
-		$normalized = (new HierarchicalPath($uri->getPath()))->withoutTrailingSlash()->withoutEmptySegments();
-		
-		$factory = new Factory();
-		$uri = $factory->create($normalized . '', $this->getBaseUrl());
-		
-		return $uri;
 	}
 }
 ?>

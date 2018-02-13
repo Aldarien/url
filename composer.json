@@ -5,7 +5,8 @@
 	"require" : {
 		"aldarien/contract" : "^1.0",
 		"aldarien/root" : "^1.0",
-		"league/uri": "^5.2"
+		"league/uri": "^5.2",
+		"sabre/uri": "^2.1"
 	},
 	"require-dev" : {
 		"phpunit/phpunit" : "^6.3"
