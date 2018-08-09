@@ -20,7 +20,7 @@ class URL
 	{
         $base = $_SERVER['HTTP_HOST'] . ((isset($_SERVER['HTTP_PORT'])) ? ':' . $_SERVER['HTTP_PORT'] : '');
 		$uri = Http::createFromString(\Sabre\Uri\resolve($_SERVER['REQUEST_SCHEME'] . '://' . $base, $_SERVER['SCRIPT_NAME']));
-		$host = new Host($uri->getHost());
+        $host = new Host($uri->getHost());
 		if ($host->isAbsolute()) {
 			return $host->getRegistrableDomain();
 		}
@@ -41,12 +41,18 @@ class URL
 	public function url($path = '', $variables = null)
 	{
 		$uri = Http::createFromString($path);
-		if ($uri->getHost() != $this->root and $uri->getHost() != '') {
+        if ($uri->getHost() != $this->root and $uri->getHost() != '') {
 			return $path;
 		}
-		
+        
 		$uri = \Sabre\Uri\resolve($this->getBaseUrl(), $path);
-		$host = new Host(Http::createFromString($uri)->getHost());
+        try {
+            $host = new Host(Http::createFromString($uri)->getHost());
+        } catch (\League\Uri\Exception $e) {
+            $uri = \Sabre\Uri\resolve($this->getBaseUrl(), '../../') . '/' . basename($path);
+            $host = new Host(Http::createFromString($uri)->getHost());
+        }
+        
 		$base = new Host(Http::createFromString($this->root)->getHost());
 		if ($host . '' != $base . '') {
 			$host = new Host(Http::createFromString($this->root)->getHost());
