@@ -18,12 +18,14 @@ class URL
 	
 	protected function findRoot()
 	{
-		$uri = Http::createFromString(\Sabre\Uri\resolve($_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'], $_SERVER['SCRIPT_NAME']));
+        $base = $_SERVER['HTTP_HOST'] . ((isset($_SERVER['HTTP_PORT'])) ? ':' . $_SERVER['HTTP_PORT'] : '');
+		$uri = Http::createFromString(\Sabre\Uri\resolve($_SERVER['REQUEST_SCHEME'] . '://' . $base, $_SERVER['SCRIPT_NAME']));
 		$host = new Host($uri->getHost());
 		if ($host->isAbsolute()) {
 			return $host->getRegistrableDomain();
 		}
-		return ($uri->getScheme() ?: 'http') . '://' . $host;
+        $base = $host . (($uri->getPort()) ? ':' . $uri->getPort() : '');
+		return ($uri->getScheme() ?: 'http') . '://' . $base;
 	}
 	protected function findRelative()
 	{
